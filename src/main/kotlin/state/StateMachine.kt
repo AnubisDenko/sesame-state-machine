@@ -4,19 +4,29 @@ import domain.Event
 import domain.StateObject
 import java.lang.Exception
 
-// This needs to change as you probably want to have multiple state machines. Ideally you have a factory or just
-// a container where you can get the appropriate instance in some way
-
-object StateMachine {
+class StateMachine(private val config: Map<State, Transitions>, val name: String) {
     fun processEvent(event:Event, stateObject: StateObject): StateObject {
-        when(event){
-            Event.PROCESS -> stateObject.state = "PROCESSED"
-            else -> throw StateMachineException("Unknown Event was received")
+        if(!config.containsKey(stateObject.state)) {
+            throw StateMachineException("Unknown State ${stateObject.state}")
         }
 
+        val transitions = config[stateObject.state] ?: throw StateMachineException("No Transitions for given State")
+        if(!transitions.containsKey(event.name)){
+            throw  StateMachineException("Unknown Event ${event.name}")
+        }
+
+        val resultStateString = transitions[event.name] ?: throw StateMachineException("No result state configured for this event")
+        stateObject.state = State(resultStateString)
         return stateObject
     }
 }
+
+
+data class State(val state: String)
+
+data class Transition(val eventName: String, val outputState: State)
+
+class Transitions(private val transitions: Map<String,String>): HashMap<String, String>(transitions)
 
 class StateMachineException: Exception {
     constructor(): super()

@@ -1,3 +1,5 @@
 package domain
 
-abstract class StateObject(var state: String)
+import state.State
+
+abstract class StateObject(var state: State):Cloneable

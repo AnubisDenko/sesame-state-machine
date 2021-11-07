@@ -1,6 +1,7 @@
 package domain
 
-enum class Event {
-    PROCESS,
-    UNKNOWN
+interface Event{
+    val name: String
 }
+
+
