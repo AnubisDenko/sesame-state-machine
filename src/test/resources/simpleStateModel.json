@@ -1,0 +1,9 @@
+{
+  "NEW": { "orderPlaced": "OR" },
+  "OR": {
+    "accept": "ACCEPTED",
+    "reject": "REJECTED"
+  },
+  "ACCEPTED": {},
+  "REJECTED": {}
+}

@@ -11,19 +11,7 @@ class StateMachineCreationTest {
         private val DUMMY_EVENT = TestEvent("Whatever")
     }
 
-    private val sampleStateModel = """
-        { 
-            NEW: { orderPlaced: "OR" },
-            OR: { 
-                accept: "ACCEPTED",
-                reject: "REJECTED"    
-            },
-            ACCEPTED: {},
-            REJECTED: {}
-        }
-        
-    """.trimIndent()
-
+    private val sampleStateModel = object {}.javaClass.getResource("/simpleStateModel.json")!!.readText().trimIndent()
 
     @Test
     fun `can create a statemachine with a given name`(){
