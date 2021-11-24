@@ -4,15 +4,22 @@ import domain.TestEvent
 import domain.TestStateObject
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 
 class StateMachineCreationTest {
+    companion object {
+        private val DUMMY_EVENT = TestEvent("Whatever")
+    }
+
     private val sampleStateModel = """
         { 
             NEW: { orderPlaced: "OR" },
             OR: { 
                 accept: "ACCEPTED",
                 reject: "REJECTED"    
-            }
+            },
+            ACCEPTED: {},
+            REJECTED: {}
         }
         
     """.trimIndent()
@@ -43,6 +50,33 @@ class StateMachineCreationTest {
         val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
 
         val processedEvent = stateMachine.processEvent(event, testStateObject)
-        assertEquals("OR", processedEvent.state.state)
+        assertEquals("OR", processedEvent.value.state)
+    }
+
+    @Test
+    fun `Engine throws an error if a State Object is inserted with an unknown state`() {
+        val testStateObject = TestStateObject("UNKNOWN")
+        val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
+
+        assertThrows<UnknownStateException> { stateMachine.processEvent(DUMMY_EVENT, testStateObject) }
+    }
+
+    @Test
+    fun `Engine throws an error if an Event is given that is unknown`(){
+        val testStateObject = TestStateObject("OR")
+        val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
+
+        assertThrows<UnknownEventException> { stateMachine.processEvent(TestEvent("UNKNOWN"), testStateObject) }
+    }
+
+    @Test
+    fun `throws error if initialized with inconsistent configuration`(){
+        val missingStateConfiguration = """
+        { 
+            NEW: { orderPlaced: "OR" }            
+        }""".trimIndent()
+
+        assertThrows<IncorrectConfigException> { StateMachineFactory.createStateMachine(missingStateConfiguration)}
     }
 }
+

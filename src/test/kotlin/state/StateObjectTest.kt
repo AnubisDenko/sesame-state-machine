@@ -12,7 +12,7 @@ class StateObjectTest {
     @Test
     fun `can mutate the state object and override`(){
         val testObject = TestStateObject("Test")
-        assertEquals("Test", testObject.state)
+        assertEquals("Test", testObject.value.state)
     }
 
     @Test

@@ -2,4 +2,4 @@ package domain
 
 import state.State
 
-abstract class StateObject(var state: State):Cloneable
+abstract class StateObject(var value: State):Cloneable
