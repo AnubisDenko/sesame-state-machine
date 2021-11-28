@@ -31,6 +31,16 @@ class StateMachineTest {
     }
 
     @Test
+    fun `can retrieve the already created statemachine if needed`(){
+        val name = "MyTestMachine"
+        val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel, name)
+        val retrievedMachine = StateMachineFactory.getStateMachineByKey(name)
+
+        assertTrue(stateMachine == retrievedMachine)
+        assertEquals(stateMachine.name, retrievedMachine.name)
+    }
+
+    @Test
     fun `transitions from NEW to OR when orderPlaced event occurs on domain object`(){
         val testStateObject = TestStateObject("NEW")
         val event = TestEvent("orderPlaced")

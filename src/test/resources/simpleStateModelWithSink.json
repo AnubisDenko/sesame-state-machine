@@ -8,7 +8,10 @@
     "accept": {
       "nextState": "ACCEPTED",
       "sinks": [
-        "domain.TestSink"
+        {
+          "class": "domain.TestSink",
+          "name" : "testSink"
+        }
       ]
     },
     "reject": {
