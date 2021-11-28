@@ -1,18 +1,24 @@
-package state
+package sesame.state
 
-import domain.DummyDataStore
-import domain.TestEvent
-import domain.TestStateObject
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import sesame.domain.DummyDataStore
+import sesame.domain.TestEvent
+import sesame.domain.TestStateObject
 
 class SinkExecutionTest {
 
     private val stateModel = object {}.javaClass.getResource("/simpleStateModelWithSink.json")!!.readText().trimIndent()
 
+    @BeforeEach
+    fun `cleanUpDummyStorage`(){
+        DummyDataStore.clear()
+    }
+
     @Test
     fun `sinks configured on a transition are triggered when even is received`() {
-        val engine = StateMachineFactory.createStateMachine(stateModel)
+        val engine = StateMachineFactory.createStateMachine(stateModel, "SingleSink")
         val testStateObject = TestStateObject("OR")
         val testEvent = TestEvent("accept")
 
@@ -26,7 +32,7 @@ class SinkExecutionTest {
 
     @Test
     fun `all sinks are triggered on a transition`() {
-        val engine = StateMachineFactory.createStateMachine(multipleSinksOnTransition)
+        val engine = StateMachineFactory.createStateMachine(multipleSinksOnTransition,"MultipleSinks")
         val testStateObject = TestStateObject("NEW")
         val testEvent = TestEvent("orderPlaced")
         engine.processEvent(testEvent, testStateObject)
@@ -44,11 +50,11 @@ class SinkExecutionTest {
               "nextState": "OR",
               "sinks": [
                 {
-                  "class": "domain.TestSink",
+                  "class": "sesame.domain.TestSink",
                   "name": "testSink"
                 },
                 {
-                  "class": "domain.TestSink",
+                  "class": "sesame.domain.TestSink",
                   "name": "testSink2"
                 }
               ]

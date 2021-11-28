@@ -9,7 +9,7 @@
       "nextState": "ACCEPTED",
       "sinks": [
         {
-          "class": "domain.TestSink",
+          "class": "sesame.domain.TestSink",
           "name" : "testSink"
         }
       ]

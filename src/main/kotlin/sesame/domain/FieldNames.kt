@@ -1,4 +1,4 @@
-package domain
+package sesame.domain
 
 enum class FieldNames{
     // NO TOP LEVEL FIELDS

@@ -1,6 +1,10 @@
-package domain
+package sesame.domain
 
-class TestSink(override val name: String = "TestSink"):Sink {
+import sesame.domain.Event
+import sesame.domain.Sink
+import sesame.domain.StateObject
+
+class TestSink(override val name: String = "TestSink"): Sink {
     private var event: Event? = null
     private var stateObject: StateObject? = null
 
@@ -16,4 +20,6 @@ object DummyDataStore{
     fun receivedEventForObject(sinkName: String, event: Event, stateObject: StateObject){
         writtenValues.add(Triple(sinkName, event, stateObject))
     }
+
+    val clear: () -> Unit = { writtenValues.clear() }
 }

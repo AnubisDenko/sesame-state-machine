@@ -1,8 +1,8 @@
-package state
+package sesame.state
 
-import domain.Event
-import domain.Sink
-import domain.StateObject
+import sesame.domain.Event
+import sesame.domain.Sink
+import sesame.domain.StateObject
 import java.lang.Exception
 
 class StateMachine(private val config: Map<State, Transitions>, val name: String) {
@@ -18,7 +18,7 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         }
     }
 
-    fun processEvent(event:Event, stateObject: StateObject): StateObject {
+    fun processEvent(event: Event, stateObject: StateObject): StateObject {
         if(!config.containsKey(stateObject.value)) {
             throw UnknownStateException("Unknown State ${stateObject.value}")
         }
@@ -51,7 +51,7 @@ data class Transition(val eventName: String, val outputState: State, val sinks: 
     }
 }
 
-class Transitions(private val transitions: Map<String,Transition>): HashMap<String, Transition>(transitions)
+class Transitions(private val transitions: Map<String, Transition>): HashMap<String, Transition>(transitions)
 
 open class StateMachineException: Exception {
     constructor(): super()

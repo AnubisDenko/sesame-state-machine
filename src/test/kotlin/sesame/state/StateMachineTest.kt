@@ -1,10 +1,14 @@
-package state
+package sesame.state
 
-import domain.TestEvent
-import domain.TestStateObject
+import sesame.domain.TestEvent
+import sesame.domain.TestStateObject
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import sesame.state.IncorrectConfigException
+import sesame.state.StateMachineFactory
+import sesame.state.UnknownEventException
+import sesame.state.UnknownStateException
 
 class StateMachineTest {
     companion object {

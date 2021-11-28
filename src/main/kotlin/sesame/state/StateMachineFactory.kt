@@ -1,17 +1,17 @@
-package state
+package sesame.state
 
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
-import domain.FieldNames
-import domain.Sink
+import sesame.domain.FieldNames
+import sesame.domain.Sink
 
 object StateMachineFactory {
     private val stateMachines = HashMap<String, StateMachine>() as MutableMap<String, StateMachine>
 
-    val getStateMachineByKey: (key: String) ->  StateMachine = { key -> stateMachines[key] ?: throw StateMachineNotFoundException("Unknown Statemachine $key") }
+    val getStateMachineByKey: (key: String) -> StateMachine = { key -> stateMachines[key] ?: throw StateMachineNotFoundException("Unknown Statemachine $key") }
 
-    fun createStateMachine(jsonDescription: String, key: String = "DEFAULT"): StateMachine{
+    fun createStateMachine(jsonDescription: String, key: String = "DEFAULT"): StateMachine {
         val machineConfig = createMachineConfig(jsonDescription)
 
         val result = stateMachines[key] ?: StateMachine(machineConfig, key)
@@ -40,7 +40,7 @@ object StateMachineFactory {
              createSinks(value.get(FieldNames.TransitionFields.Sinks.value).asJsonArray)
         } else emptyList()
 
-        return Transition(eventName,State(targetStateName), sinks)
+        return Transition(eventName, State(targetStateName), sinks)
     }
 
     private fun createSinks(sinksConfig: JsonArray): List<Sink>{

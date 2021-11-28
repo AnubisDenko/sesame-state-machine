@@ -1,6 +1,8 @@
-package domain
+package sesame.domain
 
-import state.State
+import sesame.domain.Event
+import sesame.domain.StateObject
+import sesame.state.State
 
 class TestStateObject(initialState: String = "NEW"): StateObject(State(initialState))
 class TestEvent(override val name: String): Event

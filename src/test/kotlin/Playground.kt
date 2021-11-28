@@ -1,4 +1,4 @@
-import domain.Sink
+import sesame.domain.Sink
 import kotlin.reflect.KClass
 
 fun main() {

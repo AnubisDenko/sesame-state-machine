@@ -1,4 +1,4 @@
-package domain
+package sesame.domain
 
 interface Sink {
     val name: String
