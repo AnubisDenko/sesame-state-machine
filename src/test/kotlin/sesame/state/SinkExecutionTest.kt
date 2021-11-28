@@ -12,13 +12,14 @@ class SinkExecutionTest {
     private val stateModel = object {}.javaClass.getResource("/simpleStateModelWithSink.json")!!.readText().trimIndent()
 
     @BeforeEach
-    fun `cleanUpDummyStorage`(){
+    fun reset(){
         DummyDataStore.clear()
+        StateMachineFactory.clearAllStateMachines()
     }
 
     @Test
     fun `sinks configured on a transition are triggered when even is received`() {
-        val engine = StateMachineFactory.createStateMachine(stateModel, "SingleSink")
+        val engine = StateMachineFactory.createStateMachine(stateModel)
         val testStateObject = TestStateObject("OR")
         val testEvent = TestEvent("accept")
 
@@ -32,7 +33,7 @@ class SinkExecutionTest {
 
     @Test
     fun `all sinks are triggered on a transition`() {
-        val engine = StateMachineFactory.createStateMachine(multipleSinksOnTransition,"MultipleSinks")
+        val engine = StateMachineFactory.createStateMachine(multipleSinksOnTransition)
         val testStateObject = TestStateObject("NEW")
         val testEvent = TestEvent("orderPlaced")
         engine.processEvent(testEvent, testStateObject)
@@ -50,11 +51,11 @@ class SinkExecutionTest {
               "nextState": "OR",
               "sinks": [
                 {
-                  "class": "sesame.domain.TestSink",
+                  "class": "sesame.domain.DummyStorageSink",
                   "name": "testSink"
                 },
                 {
-                  "class": "sesame.domain.TestSink",
+                  "class": "sesame.domain.DummyStorageSink",
                   "name": "testSink2"
                 }
               ]

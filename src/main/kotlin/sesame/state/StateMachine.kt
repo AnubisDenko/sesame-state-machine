@@ -1,6 +1,7 @@
 package sesame.state
 
 import sesame.domain.Event
+import sesame.domain.Gate
 import sesame.domain.Sink
 import sesame.domain.StateObject
 import java.lang.Exception
@@ -30,22 +31,29 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
 
         val transition = transitions[event.name] ?: throw StateMachineException("No Transition configured for this event ${event.name}")
 
-        // execute sinks configured on the transition
+        // execute gates and sinks configured on the transition
         executeSinks(transition, event, stateObject)
 
-        stateObject.value = State(transition.outputState.state)
+        if(executeGates(transition, event, stateObject)){
+            stateObject.value = State(transition.outputState.state)
+        }
+
         return stateObject
     }
 
     private fun executeSinks(transition: Transition, event: Event, stateObject: StateObject){
         transition.sinks.forEach { it.action(event, stateObject) }
     }
+
+    private fun executeGates(transition: Transition, event: Event, stateObject: StateObject):Boolean{
+        return transition.gates.fold(true) {  acc, gate ->  acc and gate.accept(event,stateObject) }
+    }
 }
 
 
 data class State(val state: String)
 
-data class Transition(val eventName: String, val outputState: State, val sinks: List<Sink> = emptyList()){
+data class Transition(val eventName: String, val outputState: State, val sinks: List<Sink> = emptyList(), val gates: List<Gate> = emptyList()){
     override fun toString(): String {
         return "$eventName -> ${outputState.state}"
     }

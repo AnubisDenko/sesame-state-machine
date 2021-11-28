@@ -5,10 +5,16 @@ enum class FieldNames{
     ;
     enum class TransitionFields(val value: String){
         NextState("nextState"),
-        Sinks("sinks")
+        Sinks("sinks"),
+        Gates("gates")
         ;
 
         enum class SinkFields(val value: String){
+            Class("class"),
+            Name("name")
+        }
+
+        enum class GateFields(val value: String){
             Class("class"),
             Name("name")
         }
