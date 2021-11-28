@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
-class StateMachineCreationTest {
+class StateMachineTest {
     companion object {
         private val DUMMY_EVENT = TestEvent("Whatever")
     }
@@ -60,9 +60,14 @@ class StateMachineCreationTest {
     @Test
     fun `throws error if initialized with inconsistent configuration`(){
         val missingStateConfiguration = """
-        { 
-            NEW: { orderPlaced: "OR" }            
-        }""".trimIndent()
+            {
+              "NEW": {
+                "orderPlaced": {
+                  "nextState": "OR"
+                }
+              }
+            }
+        """.trimIndent()
 
         assertThrows<IncorrectConfigException> { StateMachineFactory.createStateMachine(missingStateConfiguration)}
     }

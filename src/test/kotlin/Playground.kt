@@ -3,16 +3,25 @@ import com.google.gson.JsonParser
 import state.State
 import state.Transitions
 
-fun main(){
+fun main() {
     val sampleStateModel = """
-        { 
-            NEW: { orderPlaced: "OR" },
-            OR: { 
-                accept: "ACCEPTED",
-                reject: "REJECTED"    
+        {
+          "NEW": {
+            "orderPlaced": {
+              "nextState": "OR"
             }
+          },
+          "OR": {
+            "accept": {
+              "nextState": "ACCEPTED"
+            },
+            "reject": {
+              "nextState": "REJECTED"
+            }
+          },
+          "ACCEPTED": {},
+          "REJECTED": {}
         }
-        
     """.trimIndent()
 
     val tree = JsonParser.parseString(sampleStateModel).asJsonObject
@@ -25,6 +34,7 @@ fun main(){
 }
 
 fun readTransitions(transitions: JsonObject): Transitions {
-    val result = transitions.entrySet().map { (key, value) ->  key to value.asString}.toMap()
-    return Transitions(result)
+    val result = transitions.entrySet().map { (key, value) -> key to value.asString }.toMap()
+//    return Transitions(result)
+    return Transitions(emptyMap())
 }

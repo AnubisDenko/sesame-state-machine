@@ -2,6 +2,7 @@ package state
 
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import domain.FieldNames
 
 object StateMachineFactory {
     private val stateMachines = HashMap<String, StateMachine>() as MutableMap<String, StateMachine>
@@ -25,7 +26,13 @@ object StateMachineFactory {
     }
 
     private fun readTransitions(transitions: JsonObject): Transitions {
-        val result = transitions.entrySet().associate { (key, value) -> key to value.asString }
+        val result = transitions.entrySet().associate { (key, value) -> key to createTransition(key, value.asJsonObject) }
         return Transitions(result)
     }
+
+    private fun createTransition(eventName: String, value: JsonObject): Transition {
+        val targetStateName = value.get(FieldNames.TransitionFields.NextState.value).asString
+        return Transition(eventName,State(targetStateName))
+    }
+
 }

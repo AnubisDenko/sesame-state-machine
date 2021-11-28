@@ -6,7 +6,10 @@
   },
   "OR": {
     "accept": {
-      "nextState": "ACCEPTED"
+      "nextState": "ACCEPTED",
+      "sinks": [
+        "domain.TestSink"
+      ]
     },
     "reject": {
       "nextState": "REJECTED"

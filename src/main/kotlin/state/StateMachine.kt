@@ -10,7 +10,7 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         val unknownStates = config.values
             .map { it.values }
             .flatten()
-            .filter { !stateStrings.contains(it) }
+            .filter { !stateStrings.contains(it.outputState.state) }
 
         if(unknownStates.isNotEmpty()){
             throw IncorrectConfigException("Unknown Sates configured in Transitions $unknownStates")
@@ -28,7 +28,7 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         }
 
         val resultStateString = transitions[event.name] ?: throw StateMachineException("No result state configured for this event")
-        stateObject.value = State(resultStateString)
+        stateObject.value = State(resultStateString.outputState.state)
         return stateObject
     }
 }
@@ -36,9 +36,13 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
 
 data class State(val state: String)
 
-data class Transition(val eventName: String, val outputState: State)
+data class Transition(val eventName: String, val outputState: State){
+    override fun toString(): String {
+        return "$eventName -> ${outputState.state}"
+    }
+}
 
-class Transitions(private val transitions: Map<String,String>): HashMap<String, String>(transitions)
+class Transitions(private val transitions: Map<String,Transition>): HashMap<String, Transition>(transitions)
 
 open class StateMachineException: Exception {
     constructor(): super()
