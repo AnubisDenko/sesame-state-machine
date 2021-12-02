@@ -1,9 +1,6 @@
 package sesame.state
 
-import sesame.domain.Event
-import sesame.domain.Gate
-import sesame.domain.Sink
-import sesame.domain.StateObject
+import sesame.domain.*
 import java.lang.Exception
 
 class StateMachine(private val config: Map<State, Transitions>, val name: String) {
@@ -19,7 +16,7 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         }
     }
 
-    fun processEvent(event: Event, stateObject: StateObject): StateObject {
+    fun processEvent(event: Event, stateObject: StateObject): Output {
         if(!config.containsKey(stateObject.value)) {
             throw UnknownStateException("Unknown State ${stateObject.value}")
         }
@@ -34,22 +31,24 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         // execute gates and sinks configured on the transition
         executeSinks(transition, event, stateObject)
 
-        if( !executeGates(transition, event, stateObject)){
-            return stateObject
-        }
+        val gateResult = executeGates(transition, event, stateObject)
 
-        // TODO is it really the best approach that the state inside the StateObject is modified or should we leave that to the caller
-        // as they might want to do something else. Alternative would be to simply return the resulting state. This would also solve state being mutable
-        stateObject.value = State(transition.outputState.state)
-        return stateObject
+        return if( !gateResult.result){
+            Output(stateObject, gateResult.errorMessage)
+        }else{
+            // TODO is it really the best approach that the state inside the StateObject is modified or should we leave that to the caller
+            // as they might want to do something else. Alternative would be to simply return the resulting state. This would also solve state being mutable
+            stateObject.value = State(transition.outputState.state)
+            Output(stateObject)
+        }
     }
 
     private fun executeSinks(transition: Transition, event: Event, stateObject: StateObject){
         transition.sinks.forEach { it.action(event, stateObject) }
     }
 
-    private fun executeGates(transition: Transition, event: Event, stateObject: StateObject):Boolean{
-        return transition.gates.fold(true) {  acc, gate ->  acc and gate.accept(event,stateObject) }
+    private fun executeGates(transition: Transition, event: Event, stateObject: StateObject):GateResponse{
+        return transition.gates.fold(GateResponse(true)) { acc, gate ->  acc + gate.accept(event, stateObject) }
     }
 }
 

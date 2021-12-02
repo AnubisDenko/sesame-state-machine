@@ -3,8 +3,10 @@ package sesame.state
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import sesame.domain.FlexibleGateResponse
 import sesame.domain.TestEvent
 import sesame.domain.TestStateObject
+import kotlin.math.exp
 
 class GateExecutionTest {
     private val testEvent = TestEvent("orderPlaced")
@@ -14,6 +16,7 @@ class GateExecutionTest {
     @BeforeEach
     fun resetStateMachine(){
         StateMachineFactory.clearAllStateMachines()
+        FlexibleGateResponse.reset()
     }
 
     @Test
@@ -21,28 +24,42 @@ class GateExecutionTest {
         val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysBlockGate"))
 
         val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals(initialState, result.value.state)
+        assertEquals(initialState, result.stateObject.value.state)
     }
 
     @Test
     fun `if a gate check is positive the transition will proceed`(){
         val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate"))
         val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals("OR", result.value.state)
+        assertEquals("OR", result.stateObject.value.state)
     }
 
     @Test
     fun `blocks if one of the gates configured is failing`(){
         val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysBlockGate"))
         val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals(initialState, result.value.state)
+        assertEquals(initialState, result.stateObject.value.state)
     }
 
     @Test
     fun `passes if all gates are successful`(){
         val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysPassGate"))
         val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals("OR", result.value.state)
+        assertEquals("OR", result.stateObject.value.state)
+    }
+
+    @Test
+    fun `Gates can return a description of why they blocked the StateObject transition`(){
+        val expectedErrorMessage = "I was setup to fail without reason"
+        FlexibleGateResponse.setupNextResponse(false, expectedErrorMessage)
+
+        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.FlexibleGate"))
+        val result = stateMachine.processEvent(testEvent, testStateObject)
+        with(result){
+            assertEquals(initialState, stateObject.value.state)
+            assertEquals(1, messages.size)
+            assertEquals(expectedErrorMessage, messages.first())
+        }
     }
 
     /**
@@ -71,4 +88,5 @@ class GateExecutionTest {
                   "OR": {}
                 }
     """.trimIndent()
+
 }

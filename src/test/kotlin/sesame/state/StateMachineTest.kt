@@ -52,7 +52,7 @@ class StateMachineTest {
         val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
 
         val processedEvent = stateMachine.processEvent(event, testStateObject)
-        assertEquals("OR", processedEvent.value.state)
+        assertEquals("OR", processedEvent.stateObject.value.state)
     }
 
     @Test
