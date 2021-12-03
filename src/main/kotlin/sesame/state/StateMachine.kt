@@ -16,12 +16,13 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         }
     }
 
-    fun processEvent(event: Event, stateObject: StateObject): Output {
-        if(!config.containsKey(stateObject.value)) {
-            throw UnknownStateException("Unknown State ${stateObject.value}")
+    fun processEvent(event: Event, state: State, stateObject: Any): Output {
+
+        if(!config.containsKey(state)) {
+            throw UnknownStateException("Unknown State $state")
         }
 
-        val transitions = config[stateObject.value] ?: throw StateMachineException("No Transitions for given State ${stateObject.value} ")
+        val transitions = config[state] ?: throw StateMachineException("No Transitions for given State $state ")
         if(!transitions.containsKey(event.name)){
             throw  UnknownEventException("Unknown Event ${event.name}")
         }
@@ -34,20 +35,17 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         val gateResult = executeGates(transition, event, stateObject)
 
         return if( !gateResult.result){
-            Output(stateObject, gateResult.errorMessage)
+            Output(state, gateResult.errorMessage)
         }else{
-            // TODO is it really the best approach that the state inside the StateObject is modified or should we leave that to the caller
-            // as they might want to do something else. Alternative would be to simply return the resulting state. This would also solve state being mutable
-            stateObject.value = State(transition.outputState.state)
-            Output(stateObject)
+            Output(State(transition.outputState.state))
         }
     }
 
-    private fun executeSinks(transition: Transition, event: Event, stateObject: StateObject){
+    private fun executeSinks(transition: Transition, event: Event, stateObject: Any){
         transition.sinks.forEach { it.action(event, stateObject) }
     }
 
-    private fun executeGates(transition: Transition, event: Event, stateObject: StateObject):GateResponse{
+    private fun executeGates(transition: Transition, event: Event, stateObject: Any):GateResponse{
         return transition.gates.fold(GateResponse(true)) { acc, gate ->  acc + gate.accept(event, stateObject) }
     }
 }

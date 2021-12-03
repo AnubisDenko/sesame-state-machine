@@ -1,20 +1,20 @@
 package sesame.domain
 
 class AlwaysBlockGate(override val name: String): Gate {
-    override fun accept(event: Event, stateObject: StateObject): GateResponse {
+    override fun accept(event: Event, stateObject: Any): GateResponse {
         return GateResponse(false)
     }
 }
 
 class AlwaysPassGate(override val name: String) : Gate {
-    override fun accept(event: Event, stateObject: StateObject): GateResponse {
+    override fun accept(event: Event, stateObject: Any): GateResponse {
         return GateResponse(true)
     }
 }
 
 class FlexibleGate(override val name: String): Gate{
-    override fun accept(event: Event, stateObject: StateObject): GateResponse {
-        return if(FlexibleGateResponse == null){
+    override fun accept(event: Event, stateObject: Any): GateResponse {
+        return if(FlexibleGateResponse.error == null){
             GateResponse(FlexibleGateResponse.succeed)
         }else{
             GateResponse(FlexibleGateResponse.succeed, listOf(FlexibleGateResponse.error!!))

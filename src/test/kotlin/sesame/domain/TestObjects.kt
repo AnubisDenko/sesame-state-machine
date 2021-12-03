@@ -1,8 +1,10 @@
 package sesame.domain
 
-import sesame.domain.Event
-import sesame.domain.StateObject
 import sesame.state.State
 
-class TestStateObject(initialState: String = "NEW"): StateObject(State(initialState))
 class TestEvent(override val name: String): Event
+enum class TestStates(val state: State){
+    ORDER_RECEIVED( State("ORDER_RECEIVED")),
+    NEW( State("NEW")),
+    UNKNOWN(State("UNKNOWN"))
+}

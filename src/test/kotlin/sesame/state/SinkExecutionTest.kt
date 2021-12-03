@@ -5,7 +5,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import sesame.domain.DummyDataStore
 import sesame.domain.TestEvent
-import sesame.domain.TestStateObject
+import sesame.domain.TestStates.*
 
 class SinkExecutionTest {
 
@@ -20,23 +20,22 @@ class SinkExecutionTest {
     @Test
     fun `sinks configured on a transition are triggered when even is received`() {
         val engine = StateMachineFactory.createStateMachine(stateModel)
-        val testStateObject = TestStateObject("OR")
         val testEvent = TestEvent("accept")
+        val myBusinessObject = Any()
 
-        engine.processEvent(testEvent, testStateObject)
+        engine.processEvent(testEvent, ORDER_RECEIVED.state, myBusinessObject)
 
         assertEquals(1, DummyDataStore.writtenValues.size)
         assertEquals("testSink", DummyDataStore.writtenValues[0].first)
         assertEquals(testEvent, DummyDataStore.writtenValues[0].second)
-        assertEquals(testStateObject, DummyDataStore.writtenValues[0].third)
+        assertEquals(myBusinessObject, DummyDataStore.writtenValues[0].third)
     }
 
     @Test
     fun `all sinks are triggered on a transition`() {
         val engine = StateMachineFactory.createStateMachine(multipleSinksOnTransition)
-        val testStateObject = TestStateObject("NEW")
         val testEvent = TestEvent("orderPlaced")
-        engine.processEvent(testEvent, testStateObject)
+        engine.processEvent(testEvent, NEW.state, Any())
 
         assertEquals(2, DummyDataStore.writtenValues.size)
         assertEquals("testSink", DummyDataStore.writtenValues[0].first)
@@ -48,7 +47,7 @@ class SinkExecutionTest {
         {
           "NEW": {
             "orderPlaced": {
-              "nextState": "OR",
+              "nextState": "ORDER_RECEIVED",
               "sinks": [
                 {
                   "class": "sesame.domain.DummyStorageSink",
@@ -61,7 +60,7 @@ class SinkExecutionTest {
               ]
             }
           },
-          "OR": {}
+          "ORDER_RECEIVED": {}
         }
         """.trimIndent()
 }

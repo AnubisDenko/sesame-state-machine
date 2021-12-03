@@ -1,14 +1,11 @@
 package sesame.state
 
 import sesame.domain.TestEvent
-import sesame.domain.TestStateObject
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import sesame.state.IncorrectConfigException
-import sesame.state.StateMachineFactory
-import sesame.state.UnknownEventException
-import sesame.state.UnknownStateException
+import sesame.domain.TestStates.*
+
 
 class StateMachineTest {
     companion object {
@@ -46,29 +43,25 @@ class StateMachineTest {
 
     @Test
     fun `transitions from NEW to OR when orderPlaced event occurs on domain object`(){
-        val testStateObject = TestStateObject("NEW")
         val event = TestEvent("orderPlaced")
 
         val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
 
-        val processedEvent = stateMachine.processEvent(event, testStateObject)
-        assertEquals("OR", processedEvent.stateObject.value.state)
+        val processedEvent = stateMachine.processEvent(event, NEW.state, Any())
+        assertEquals(ORDER_RECEIVED.state, processedEvent.state)
     }
 
     @Test
     fun `Engine throws an error if a State Object is inserted with an unknown state`() {
-        val testStateObject = TestStateObject("UNKNOWN")
         val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
 
-        assertThrows<UnknownStateException> { stateMachine.processEvent(DUMMY_EVENT, testStateObject) }
+        assertThrows<UnknownStateException> { stateMachine.processEvent(DUMMY_EVENT, UNKNOWN.state, Any()) }
     }
 
     @Test
     fun `Engine throws an error if an Event is given that is unknown`(){
-        val testStateObject = TestStateObject("OR")
         val stateMachine = StateMachineFactory.createStateMachine(sampleStateModel)
-
-        assertThrows<UnknownEventException> { stateMachine.processEvent(TestEvent("UNKNOWN"), testStateObject) }
+        assertThrows<UnknownEventException> { stateMachine.processEvent(TestEvent("UNKNOWN"), ORDER_RECEIVED.state, Any()) }
     }
 
     @Test
