@@ -1,6 +1,6 @@
 package sesame.domain
 
-interface Sink {
+interface Sink<T> {
     val name: String
-    fun action(event: Event, stateObject: StateObject)
+    fun action(event: Event, stateObject: T)
 }

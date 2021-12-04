@@ -1,10 +1,10 @@
 {
   "NEW": {
     "orderPlaced": {
-      "nextState": "OR"
+      "nextState": "ORDER_RECEIVED"
     }
   },
-  "OR": {
+  "ORDER_RECEIVED": {
     "accept": {
       "nextState": "ACCEPTED",
       "sinks": [

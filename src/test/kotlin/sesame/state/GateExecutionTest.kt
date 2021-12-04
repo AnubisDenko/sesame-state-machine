@@ -5,13 +5,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import sesame.domain.FlexibleGateResponse
 import sesame.domain.TestEvent
-import sesame.domain.TestStateObject
-import kotlin.math.exp
+import sesame.domain.TestStates.*
 
 class GateExecutionTest {
     private val testEvent = TestEvent("orderPlaced")
-    private val initialState = "NEW" // TODO currently the state inside the stateObject is mutable, which it shouldn't be. need to fix later
-    private val testStateObject = TestStateObject(initialState)
 
     @BeforeEach
     fun resetStateMachine(){
@@ -21,31 +18,31 @@ class GateExecutionTest {
 
     @Test
     fun `if a gate check is negative the transition will be blocked and we will receive the original state as target state`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysBlockGate"))
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysBlockGate"))
 
-        val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals(initialState, result.stateObject.value.state)
+        val result = stateMachine.processEvent(testEvent, NEW.state, Any())
+        assertEquals(NEW.state, result.state)
     }
 
     @Test
     fun `if a gate check is positive the transition will proceed`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate"))
-        val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals("OR", result.stateObject.value.state)
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysPassGate"))
+        val result = stateMachine.processEvent(testEvent, NEW.state, Any())
+        assertEquals(ORDER_RECEIVED.state, result.state)
     }
 
     @Test
     fun `blocks if one of the gates configured is failing`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysBlockGate"))
-        val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals(initialState, result.stateObject.value.state)
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysBlockGate"))
+        val result = stateMachine.processEvent(testEvent, NEW.state, Any())
+        assertEquals(NEW.state, result.state)
     }
 
     @Test
     fun `passes if all gates are successful`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysPassGate"))
-        val result = stateMachine.processEvent(testEvent, testStateObject)
-        assertEquals("OR", result.stateObject.value.state)
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysPassGate"))
+        val result = stateMachine.processEvent(testEvent, NEW.state, Any())
+        assertEquals(ORDER_RECEIVED.state, result.state)
     }
 
     @Test
@@ -53,10 +50,10 @@ class GateExecutionTest {
         val expectedErrorMessage = "I was setup to fail without reason"
         FlexibleGateResponse.setupNextResponse(false, expectedErrorMessage)
 
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.FlexibleGate"))
-        val result = stateMachine.processEvent(testEvent, testStateObject)
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.FlexibleGate"))
+        val result = stateMachine.processEvent(testEvent, NEW.state, Any())
         with(result){
-            assertEquals(initialState, stateObject.value.state)
+            assertEquals(NEW.state, state)
             assertEquals(1, messages.size)
             assertEquals(expectedErrorMessage, messages.first())
         }
@@ -81,11 +78,11 @@ class GateExecutionTest {
                 {
                   "NEW": {
                     "orderPlaced": {
-                      "nextState": "OR",
+                      "nextState": "ORDER_RECEIVED",
                       "gates": %GATES%
                     }
                   },
-                  "OR": {}
+                  "ORDER_RECEIVED": {}
                 }
     """.trimIndent()
 

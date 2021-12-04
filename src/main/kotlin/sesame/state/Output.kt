@@ -1,5 +1,3 @@
 package sesame.state
 
-import sesame.domain.StateObject
-
-data class Output(val stateObject: StateObject, val messages: List<String> = emptyList())
+data class Output(val state: State, val messages: List<String> = emptyList())
