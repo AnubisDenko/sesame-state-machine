@@ -14,7 +14,7 @@ class SinkExecutionTest {
     @BeforeEach
     fun reset(){
         DummyDataStore.clear()
-//        StateMachineFactory.clearAllStateMachines()
+        StateMachineFactory.clearAllStateMachines()
     }
 
     @Test

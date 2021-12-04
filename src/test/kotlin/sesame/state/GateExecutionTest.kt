@@ -12,7 +12,7 @@ class GateExecutionTest {
 
     @BeforeEach
     fun resetStateMachine(){
-//        StateMachineFactory.clearAllStateMachines()
+        StateMachineFactory.clearAllStateMachines()
         FlexibleGateResponse.reset()
     }
 
