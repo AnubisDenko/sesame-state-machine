@@ -14,12 +14,12 @@ class SinkExecutionTest {
     @BeforeEach
     fun reset(){
         DummyDataStore.clear()
-        StateMachineFactory.clearAllStateMachines()
+//        StateMachineFactory.clearAllStateMachines()
     }
 
     @Test
     fun `sinks configured on a transition are triggered when even is received`() {
-        val engine = StateMachineFactory.createStateMachine(stateModel)
+        val engine = StateMachineFactory.createStateMachine<Any>(stateModel)
         val testEvent = TestEvent("accept")
         val myBusinessObject = Any()
 
@@ -33,7 +33,7 @@ class SinkExecutionTest {
 
     @Test
     fun `all sinks are triggered on a transition`() {
-        val engine = StateMachineFactory.createStateMachine(multipleSinksOnTransition)
+        val engine = StateMachineFactory.createStateMachine<Any>(multipleSinksOnTransition)
         val testEvent = TestEvent("orderPlaced")
         engine.processEvent(testEvent, NEW.state, Any())
 

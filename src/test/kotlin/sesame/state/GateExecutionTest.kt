@@ -12,13 +12,13 @@ class GateExecutionTest {
 
     @BeforeEach
     fun resetStateMachine(){
-        StateMachineFactory.clearAllStateMachines()
+//        StateMachineFactory.clearAllStateMachines()
         FlexibleGateResponse.reset()
     }
 
     @Test
     fun `if a gate check is negative the transition will be blocked and we will receive the original state as target state`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysBlockGate"))
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysBlockGate"))
 
         val result = stateMachine.processEvent(testEvent, NEW.state, Any())
         assertEquals(NEW.state, result.state)
@@ -26,21 +26,21 @@ class GateExecutionTest {
 
     @Test
     fun `if a gate check is positive the transition will proceed`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate"))
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysPassGate"))
         val result = stateMachine.processEvent(testEvent, NEW.state, Any())
         assertEquals(ORDER_RECEIVED.state, result.state)
     }
 
     @Test
     fun `blocks if one of the gates configured is failing`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysBlockGate"))
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysBlockGate"))
         val result = stateMachine.processEvent(testEvent, NEW.state, Any())
         assertEquals(NEW.state, result.state)
     }
 
     @Test
     fun `passes if all gates are successful`(){
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysPassGate"))
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.AlwaysPassGate","sesame.domain.AlwaysPassGate"))
         val result = stateMachine.processEvent(testEvent, NEW.state, Any())
         assertEquals(ORDER_RECEIVED.state, result.state)
     }
@@ -50,7 +50,7 @@ class GateExecutionTest {
         val expectedErrorMessage = "I was setup to fail without reason"
         FlexibleGateResponse.setupNextResponse(false, expectedErrorMessage)
 
-        val stateMachine = StateMachineFactory.createStateMachine(setupTemplate("sesame.domain.FlexibleGate"))
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(setupTemplate("sesame.domain.FlexibleGate"))
         val result = stateMachine.processEvent(testEvent, NEW.state, Any())
         with(result){
             assertEquals(NEW.state, state)

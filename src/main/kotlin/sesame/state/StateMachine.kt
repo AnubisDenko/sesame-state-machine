@@ -3,7 +3,7 @@ package sesame.state
 import sesame.domain.*
 import java.lang.Exception
 
-class StateMachine(private val config: Map<State, Transitions>, val name: String) {
+class StateMachine<T>(private val config: Map<State, Transitions<T>>, val name: String) {
     init{
         val stateStrings = config.keys.map { state -> state.state }
         val unknownStates = config.values
@@ -16,7 +16,7 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         }
     }
 
-    fun processEvent(event: Event, state: State, stateObject: Any): Output {
+    fun processEvent(event: Event, state: State, stateObject: T): Output {
 
         if(!config.containsKey(state)) {
             throw UnknownStateException("Unknown State $state")
@@ -41,11 +41,11 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
         }
     }
 
-    private fun executeSinks(transition: Transition, event: Event, stateObject: Any){
+    private fun executeSinks(transition: Transition<T>, event: Event, stateObject: T){
         transition.sinks.forEach { it.action(event, stateObject) }
     }
 
-    private fun executeGates(transition: Transition, event: Event, stateObject: Any):GateResponse{
+    private fun executeGates(transition: Transition<T>, event: Event, stateObject: T):GateResponse{
         return transition.gates.fold(GateResponse(true)) { acc, gate ->  acc + gate.accept(event, stateObject) }
     }
 }
@@ -53,13 +53,13 @@ class StateMachine(private val config: Map<State, Transitions>, val name: String
 
 data class State(val state: String)
 
-data class Transition(val eventName: String, val outputState: State, val sinks: List<Sink> = emptyList(), val gates: List<Gate> = emptyList()){
+data class Transition<T>(val eventName: String, val outputState: State, val sinks: List<Sink<T>> = emptyList(), val gates: List<Gate<T>> = emptyList()){
     override fun toString(): String {
         return "$eventName -> ${outputState.state}"
     }
 }
 
-class Transitions(private val transitions: Map<String, Transition>): HashMap<String, Transition>(transitions)
+class Transitions<T>(private val transitions: Map<String, Transition<T>>): HashMap<String, Transition<T>>(transitions)
 
 open class StateMachineException: Exception {
     constructor(): super()

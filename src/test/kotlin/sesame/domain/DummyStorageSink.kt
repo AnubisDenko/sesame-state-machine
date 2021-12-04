@@ -1,6 +1,6 @@
 package sesame.domain
 
-class DummyStorageSink(override val name: String = "TestSink") : Sink {
+class DummyStorageSink(override val name: String = "TestSink") : Sink<Any> {
     override fun action(event: Event, stateObject: Any) {
         DummyDataStore.receivedEventForObject(name, event, stateObject)
     }
