@@ -1,0 +1,12 @@
+{
+  "NEW": {
+    "orderPlaced": {
+      "nextState": "ORDER_RECEIVED",
+      "gates": [{
+        "class": "sesame.domain.AlwaysBlockGate",
+        "name": "AlwaysBlockGate"
+      }]
+    }
+  },
+  "ORDER_RECEIVED": {}
+}

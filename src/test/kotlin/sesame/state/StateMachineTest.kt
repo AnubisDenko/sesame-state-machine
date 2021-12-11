@@ -31,15 +31,15 @@ class StateMachineTest {
         assertEquals(stateMachine.name, stateMachineAgain.name)
     }
 
-//    @Test
-//    fun `can retrieve the already created statemachine if needed`(){
-//        val name = "MyTestMachine"
-//        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel, name)
-//        val retrievedMachine = StateMachineFactory.getStateMachineByKey(name)
-//
-//        assertTrue(stateMachine == retrievedMachine)
-//        assertEquals(stateMachine.name, retrievedMachine.name)
-//    }
+    @Test
+    fun `can retrieve the already created statemachine if needed`(){
+        val name = "MyTestMachine"
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel, name)
+        val retrievedMachine = StateMachineFactory.getStateMachineByKey<Any>(name)
+
+        assertTrue(stateMachine == retrievedMachine)
+        assertEquals(stateMachine.name, retrievedMachine.name)
+    }
 
     @Test
     fun `transitions from NEW to OR when orderPlaced event occurs on domain object`(){

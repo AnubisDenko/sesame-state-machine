@@ -1,0 +1,27 @@
+{
+  "NEW": {
+    "orderPlaced": {
+      "nextState": "ORDER_RECEIVED"
+    }
+  },
+  "ORDER_RECEIVED": {
+    "accept": {
+      "nextState": "ACCEPTED",
+      "sinks": [
+        {
+          "class": "sesame.domain.DummyStorageSink",
+          "name" : "testSink"
+        }
+      ],
+      "gates": [{
+        "class": "sesame.domain.AlwaysPassGate",
+        "name": "MyBusinessGate"
+      }]
+    },
+    "reject": {
+      "nextState": "REJECTED"
+    }
+  },
+  "ACCEPTED": {},
+  "REJECTED": {}
+}
