@@ -32,3 +32,10 @@ fabric.properties
 
 # Gradle cache files
 .gradle
+
+# output files
+generated_model.png
+
+# personal temp files
+src/test/resources/test.plantuml
+src/test/resources/test_state.plantuml

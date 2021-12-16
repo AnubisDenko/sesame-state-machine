@@ -59,6 +59,7 @@ class GateExecutionTest {
         }
     }
 
+
     /**
      * to save some time and make it easy to setup multiple gates in a default configuration
      */

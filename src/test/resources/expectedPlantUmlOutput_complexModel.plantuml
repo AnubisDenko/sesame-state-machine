@@ -1,0 +1,26 @@
+@startuml
+left to right direction
+'states'
+state ORDER_RECEIVED
+state NEW
+state REJECTED
+state ACCEPTED
+state fork_Accept <<fork>>
+state testSink{
+    testSink: sesame.domain.DummyStorageSink
+}
+state ORDER_RECEIVED_Gate <<choice>>
+note right of ORDER_RECEIVED_Gate
+    MyBusinessGate: [sesame.domain.AlwaysPassGate]
+end note
+
+' state transitions
+NEW --> ORDER_RECEIVED: orderPlaced
+ORDER_RECEIVED --> REJECTED: reject
+ORDER_RECEIVED --> fork_Accept: accept
+fork_Accept --> testSink
+fork_Accept --> ORDER_RECEIVED_Gate: accept
+ORDER_RECEIVED_Gate --> ACCEPTED: success
+ORDER_RECEIVED_Gate --> ORDER_RECEIVED: failure
+
+@enduml

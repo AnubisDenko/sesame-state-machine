@@ -3,26 +3,14 @@ package sesame.state
 import sesame.domain.*
 import java.lang.Exception
 
-class StateMachine<T>(private val config: Map<State, Transitions<T>>, val name: String) {
-    init{
-        val stateStrings = config.keys.map { state -> state.state }
-        val unknownStates = config.values
-            .map { it.values }
-            .flatten()
-            .filter { !stateStrings.contains(it.outputState.state) }
-
-        if(unknownStates.isNotEmpty()){
-            throw IncorrectConfigException("Unknown Sates configured in Transitions $unknownStates")
-        }
-    }
+class StateMachine<T>(private val config: StateMachineConfig<T>, val name: String) {
 
     fun processEvent(event: Event, state: State, stateObject: T): Output {
-
-        if(!config.containsKey(state)) {
+        if(!config.states.contains(state)) {
             throw UnknownStateException("Unknown State $state")
         }
 
-        val transitions = config[state] ?: throw StateMachineException("No Transitions for given State $state ")
+        val transitions = config.getTransitionsForState(state)
         if(!transitions.containsKey(event.name)){
             throw  UnknownEventException("Unknown Event ${event.name}")
         }
@@ -53,9 +41,9 @@ class StateMachine<T>(private val config: Map<State, Transitions<T>>, val name: 
 
 data class State(val state: String)
 
-data class Transition<T>(val eventName: String, val outputState: State, val sinks: List<Sink<T>> = emptyList(), val gates: List<Gate<T>> = emptyList()){
+data class Transition<T>(val inputState: State, val eventName: String, val outputState: State, val sinks: List<Sink<T>> = emptyList(), val gates: List<Gate<T>> = emptyList()){
     override fun toString(): String {
-        return "$eventName -> ${outputState.state}"
+        return "${inputState.state} -> $eventName -> ${outputState.state}"
     }
 }
 
