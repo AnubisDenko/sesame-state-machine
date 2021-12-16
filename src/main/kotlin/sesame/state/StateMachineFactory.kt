@@ -14,7 +14,10 @@ object StateMachineFactory {
 
     fun <T> createStateMachine(jsonDescription: String, key: String = "DEFAULT"): StateMachine<T> {
         val machineConfig = StateMachineConfig<T>(jsonDescription)
+        return createStateMachine(machineConfig, key)
+    }
 
+    fun <T> createStateMachine(machineConfig: StateMachineConfig<T>, key: String = "DEFAULT"): StateMachine<T> {
         val result = stateMachines[key] ?: StateMachine(machineConfig, key)
         stateMachines[key] = result
         return result as StateMachine<T>
