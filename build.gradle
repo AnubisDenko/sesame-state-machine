@@ -1,9 +1,11 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.6.0'
+    id 'maven-publish'
+    id 'signing'
 }
 
-group 'net.sesame'
-version '1.0-SNAPSHOT'
+group 'io.github.anubisdenko'
+version '1.0'
 
 repositories {
     mavenCentral()
@@ -23,3 +25,71 @@ test {
     useJUnitPlatform()
 }
 
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+publishing {
+    publications {
+        myLibrary(MavenPublication) {
+            from components.java
+            artifacts {
+                artifact tasks.sourcesJar
+                artifact tasks.javadocJar
+            }
+
+            groupId = 'io.github.anubisdenko'
+            artifactId = 'sesame'
+            version = '1.0'
+
+            pom{
+                name = 'Sesame Statemachine'
+                description = 'Simple framework to configure a state model and move business objects through model'
+                url = 'https://github.com/AnubisDenko/sesame-state-machine'
+
+                licenses {
+                    license {
+                        name = 'The Apache License, Version 2.0'
+                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id = 'orefle'
+                        name = 'Oliver Refle'
+                        email = 'clark_dodos_0j@icloud.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git@github.com:AnubisDenko/sesame-state-machine.git'
+                    developerConnection = 'scm:git@github.com:AnubisDenko/sesame-state-machine.git'
+                    url = 'https://github.com/AnubisDenko/sesame-state-machine'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            credentials(PasswordCredentials)
+
+            // change URLs to point to your repos, e.g. http://my.org/repo
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
+
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.myLibrary
+}
