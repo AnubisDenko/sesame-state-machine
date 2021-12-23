@@ -1,6 +1,8 @@
 @file:Suppress("UNCHECKED_CAST")
 package sesame.state
 
+import sesame.state.exceptions.StateMachineNotFoundException
+
 object StateMachineFactory {
     private val stateMachines = HashMap<String, StateMachine<out Any?>>() as MutableMap<String, StateMachine<out Any?>>
 

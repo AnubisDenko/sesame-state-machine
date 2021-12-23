@@ -5,6 +5,9 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import sesame.domain.TestStates.*
+import sesame.state.exceptions.IncorrectConfigException
+import sesame.state.exceptions.UnknownEventException
+import sesame.state.exceptions.UnknownStateException
 
 
 class StateMachineTest {
