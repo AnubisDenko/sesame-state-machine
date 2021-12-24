@@ -39,6 +39,10 @@ class StateMachine<T>(private val config: StateMachineConfig<T>, val name: Strin
         }
     }
 
+    fun getTransitionsForState(state: State): Transitions<T>{
+        return config.getTransitionsForState(state)
+    }
+
     private fun executeSinks(transition: Transition<T>, event: Event, stateObject: T) {
         transition.sinks.forEach { it.action(event, stateObject) }
     }

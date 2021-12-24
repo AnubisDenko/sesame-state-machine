@@ -67,6 +67,18 @@ class StateMachineTest {
         assertThrows<UnknownEventException> { stateMachine.processEvent(Any(), TestEvent("UNKNOWN"), ORDER_RECEIVED.state) }
     }
 
+    @Test
+    fun `can load transactions for a given state`(){
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
+        val transitions = stateMachine.getTransitionsForState(State("ORDER_RECEIVED"))
+        assertEquals(2, transitions.values.size)
+        assertTrue(transitions.values.any { it.eventName == "accept" })
+        assertTrue(transitions.values.any { it.eventName == "reject" })
+
+    }
+
+
+
 //    @Test
 //    fun `automatically detects initial state in model when a new object is put in`(){
 //        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
