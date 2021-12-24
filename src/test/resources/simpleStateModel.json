@@ -1,5 +1,6 @@
 {
   "NEW": {
+    "initialState": true,
     "orderPlaced": {
       "nextState": "ORDER_RECEIVED"
     }

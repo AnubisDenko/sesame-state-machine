@@ -19,7 +19,7 @@ class StpStateMachineTest {
     fun `automatically transitions along the stp path until no more stp transitions are configured`(){
         val stateMachine = StateMachineFactory.createStateMachine<Any>(basicStpConfig)
         val event = TestEvent("orderPlaced")
-        val result = stateMachine.processEvent(event, NEW.state, Any())
+        val result = stateMachine.processEvent(Any(), event, NEW.state)
 
         assertEquals(ACCEPTED.state, result.state)
     }
@@ -48,7 +48,7 @@ class StpStateMachineTest {
     fun `auto transition will also be stopped in case a gate is triggered`(){
         val stateMachine = StateMachineFactory.createStateMachine<Any>(basicStpConfigWithBlockingGate)
         val event = TestEvent("orderPlaced")
-        assertEquals( ORDER_RECEIVED.state, stateMachine.processEvent(event, NEW.state, Any()).state)
+        assertEquals( ORDER_RECEIVED.state, stateMachine.processEvent(Any(), event, NEW.state).state)
     }
 }
 

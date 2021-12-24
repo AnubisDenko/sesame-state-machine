@@ -46,7 +46,7 @@ publishing {
 
             groupId = 'io.github.anubisdenko'
             artifactId = 'sesame'
-            version = '1.0.1'
+            version = '1.0.2-SNAPSHOT'
 
             pom{
                 name = 'Sesame Statemachine'

@@ -8,13 +8,15 @@ import java.util.NoSuchElementException
 
 class StateMachine<T>(private val config: StateMachineConfig<T>, val name: String) {
 
-    fun processEvent(event: Event, state: State, stateObject: T): Output {
-        if (!config.states.contains(state)) {
-            throw UnknownStateException("Unknown State $state")
+    fun processEvent(stateObject: T, event: Event, state: State? = null): Output {
+        val startState = state ?: config.initialState
+
+        if (!config.states.contains(startState)) {
+            throw UnknownStateException("Unknown State $startState")
         }
 
 
-        val transitions = config.getTransitionsForState(state)
+        val transitions = config.getTransitionsForState(startState)
         if (!transitions.containsKey(event.name)) {
             throw  UnknownEventException("Unknown Event ${event.name}")
         }
@@ -26,14 +28,14 @@ class StateMachine<T>(private val config: StateMachineConfig<T>, val name: Strin
         val gateResult = executeGates(transition, event, stateObject)
 
         if (!gateResult.result) {
-            return Output(state, gateResult.errorMessage)
+            return Output(startState, gateResult.errorMessage)
         }
 
         val stpEvent = config.getTransitionsForState(transition.outputState).getStpTransition()
         return if (stpEvent == null) {
             Output(State(transition.outputState.state))
         } else {
-            processEvent(InternalEvent(stpEvent.eventName), transition.outputState, stateObject)
+            processEvent(stateObject, InternalEvent(stpEvent.eventName), transition.outputState)
         }
     }
 
