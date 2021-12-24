@@ -23,7 +23,7 @@ class SinkExecutionTest {
         val testEvent = TestEvent("accept")
         val myBusinessObject = Any()
 
-        engine.processEvent(testEvent, ORDER_RECEIVED.state, myBusinessObject)
+        engine.processEvent(myBusinessObject, testEvent, ORDER_RECEIVED.state)
 
         assertEquals(1, DummyDataStore.writtenValues.size)
         assertEquals("testSink", DummyDataStore.writtenValues[0].first)
@@ -35,7 +35,7 @@ class SinkExecutionTest {
     fun `all sinks are triggered on a transition`() {
         val engine = StateMachineFactory.createStateMachine<Any>(multipleSinksOnTransition)
         val testEvent = TestEvent("orderPlaced")
-        engine.processEvent(testEvent, NEW.state, Any())
+        engine.processEvent(Any(), testEvent, NEW.state)
 
         assertEquals(2, DummyDataStore.writtenValues.size)
         assertEquals("testSink", DummyDataStore.writtenValues[0].first)

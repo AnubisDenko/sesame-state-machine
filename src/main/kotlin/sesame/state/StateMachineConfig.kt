@@ -23,6 +23,11 @@ class StateMachineConfig<T>(jsonConfig: String) {
             return underlyingConfig.keys
         }
 
+    val initialState: State
+        get() = internalInitialState
+
+    private lateinit var internalInitialState: State
+
     val containsState: (State) -> Boolean = { state -> underlyingConfig.containsKey(state) }
     val getTransitionsForState: (State) -> Transitions<T> =
         { underlyingConfig[it] ?: throw UnknownStateException("No Transitions for given State $it") }
@@ -42,14 +47,27 @@ class StateMachineConfig<T>(jsonConfig: String) {
     private fun <T> createStateMachineConfig(jsonDescription: String): Map<State, Transitions<T>> {
         val tree = JsonParser.parseString(jsonDescription).asJsonObject
         val beforeStates = tree.keySet()
+
+        setInitialState(tree)
+
         return beforeStates.associate { stateString ->
             val inputState = State(stateString)
             inputState to readTransitions<T>(inputState, tree[stateString].asJsonObject)
         }
     }
 
+    private fun setInitialState(tree: JsonObject){
+        val allInitStates = tree.entrySet().filter {  (_, value) -> value.asJsonObject.get("initialState") != null }
+
+        when(allInitStates.size){
+            0 -> return
+            1 -> internalInitialState = State(allInitStates.first().key)
+            else -> throw IncorrectConfigException("More than one initial state found in configuration")
+        }
+    }
+
     private fun <T> readTransitions(inputState: State, transitions: JsonObject): Transitions<T> {
-        val result = transitions.entrySet().associate { (key, value) ->
+        val result = transitions.entrySet().filter { (_, value) -> value.isJsonObject }.associate { (key, value) ->
             key to createTransition<T>(
                 inputState,
                 key,

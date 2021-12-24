@@ -50,7 +50,7 @@ class StateMachineTest {
 
         val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
 
-        val processedEvent = stateMachine.processEvent(event, NEW.state, Any())
+        val processedEvent = stateMachine.processEvent(Any(), event, NEW.state)
         assertEquals(ORDER_RECEIVED.state, processedEvent.state)
     }
 
@@ -58,28 +58,25 @@ class StateMachineTest {
     fun `Engine throws an error if a State Object is inserted with an unknown state`() {
         val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
 
-        assertThrows<UnknownStateException> { stateMachine.processEvent(DUMMY_EVENT, UNKNOWN.state, Any()) }
+        assertThrows<UnknownStateException> { stateMachine.processEvent(Any(), DUMMY_EVENT, UNKNOWN.state) }
     }
 
     @Test
     fun `Engine throws an error if an Event is given that is unknown`(){
         val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
-        assertThrows<UnknownEventException> { stateMachine.processEvent(TestEvent("UNKNOWN"), ORDER_RECEIVED.state, Any()) }
+        assertThrows<UnknownEventException> { stateMachine.processEvent(Any(), TestEvent("UNKNOWN"), ORDER_RECEIVED.state) }
     }
 
-    @Test
-    fun `throws error if initialized with inconsistent configuration`(){
-        val missingStateConfiguration = """
-            {
-              "NEW": {
-                "orderPlaced": {
-                  "nextState": "OR"
-                }
-              }
-            }
-        """.trimIndent()
+//    @Test
+//    fun `automatically detects initial state in model when a new object is put in`(){
+//        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
+//        val testEvent = TestEvent("orderPlaced")
+//
+//        val result = stateMachine.processEvent(Any(), testEvent)
+//        assertEquals("ORDER_RECEIVED", result.state.state)
+//    }
 
-        assertThrows<IncorrectConfigException> { StateMachineFactory.createStateMachine<Any>(missingStateConfiguration)}
-    }
+
+
 }
 
