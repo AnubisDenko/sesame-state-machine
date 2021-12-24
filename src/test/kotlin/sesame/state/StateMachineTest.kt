@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import sesame.domain.TestStates.*
-import sesame.state.exceptions.IncorrectConfigException
 import sesame.state.exceptions.UnknownEventException
 import sesame.state.exceptions.UnknownStateException
 
@@ -72,12 +71,10 @@ class StateMachineTest {
         val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
         val transitions = stateMachine.getTransitionsForState(State("ORDER_RECEIVED"))
         assertEquals(2, transitions.values.size)
-        assertTrue(transitions.values.any { it.eventName == "accept" })
         assertTrue(transitions.values.any { it.eventName == "reject" })
+        assertTrue(transitions.values.any { it.eventName == "accept" })
 
     }
-
-
 
 //    @Test
 //    fun `automatically detects initial state in model when a new object is put in`(){
