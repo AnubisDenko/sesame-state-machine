@@ -67,14 +67,14 @@ class StateMachineTest {
         assertThrows<UnknownEventException> { stateMachine.processEvent(Any(), TestEvent("UNKNOWN"), ORDER_RECEIVED.state) }
     }
 
-    @Test
-    fun `automatically detects initial state in model when a new object is put in`(){
-        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
-        val testEvent = TestEvent("orderPlaced")
-
-        val result = stateMachine.processEvent(Any(), testEvent)
-        assertEquals("ORDER_RECEIVED", result.state.state)
-    }
+//    @Test
+//    fun `automatically detects initial state in model when a new object is put in`(){
+//        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
+//        val testEvent = TestEvent("orderPlaced")
+//
+//        val result = stateMachine.processEvent(Any(), testEvent)
+//        assertEquals("ORDER_RECEIVED", result.state.state)
+//    }
 
 
 
