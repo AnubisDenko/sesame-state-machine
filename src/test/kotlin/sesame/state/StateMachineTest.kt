@@ -2,10 +2,10 @@ package sesame.state
 
 import sesame.domain.TestEvent
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import sesame.domain.TestStates.*
-import sesame.state.exceptions.IncorrectConfigException
 import sesame.state.exceptions.UnknownEventException
 import sesame.state.exceptions.UnknownStateException
 
@@ -15,6 +15,11 @@ class StateMachineTest {
         private val DUMMY_EVENT = TestEvent("Whatever")
     }
 
+    @BeforeEach
+    fun before(){
+        StateMachineFactory.clearAllStateMachines()
+    }
+    
     private val sampleStateModel = object {}.javaClass.getResource("/simpleStateModel.json")!!.readText().trimIndent()
 
     @Test
@@ -65,6 +70,16 @@ class StateMachineTest {
     fun `Engine throws an error if an Event is given that is unknown`(){
         val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
         assertThrows<UnknownEventException> { stateMachine.processEvent(Any(), TestEvent("UNKNOWN"), ORDER_RECEIVED.state) }
+    }
+
+    @Test
+    fun `can load transactions for a given state`(){
+        val stateMachine = StateMachineFactory.createStateMachine<Any>(sampleStateModel)
+        val transitions = stateMachine.getTransitionsForState(State("ORDER_RECEIVED"))
+        assertEquals(2, transitions.values.size)
+        assertTrue(transitions.values.any { it.eventName == "reject" })
+        assertTrue(transitions.values.any { it.eventName == "accept" })
+
     }
 
 //    @Test
