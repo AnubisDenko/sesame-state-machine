@@ -2,6 +2,7 @@ package sesame.state
 
 import sesame.domain.TestEvent
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import sesame.domain.TestStates.*
@@ -14,6 +15,11 @@ class StateMachineTest {
         private val DUMMY_EVENT = TestEvent("Whatever")
     }
 
+    @BeforeEach
+    fun before(){
+        StateMachineFactory.clearAllStateMachines()
+    }
+    
     private val sampleStateModel = object {}.javaClass.getResource("/simpleStateModel.json")!!.readText().trimIndent()
 
     @Test
