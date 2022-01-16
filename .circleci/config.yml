@@ -1,38 +1,30 @@
 # Java Gradle CircleCI 2.0 configuration file
 # See: https://circleci.com/docs/2.0/language-java/
-version: 2
+version: 2.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs:
-  build:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+
+executors:
+  default:
     docker:
-      # specify the version you desire here
       - image: cimg/openjdk:14.0
 
-      # Specify service dependencies here if necessary
-      # CircleCI maintains a library of pre-built images
-      # documented at https://circleci.com/docs/2.0/circleci-images/
-      # - image: circleci/postgres:9.4
-
     working_directory: ~/repo
-
     environment:
       # Customize the JVM maximum heap limit
       JVM_OPTS: -Xmx3200m
       TERM: dumb
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+
+jobs:
+  build:
+    executor: default
+
     steps:
       - checkout
-
-      # Download and cache dependencies
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "build.gradle" }}
-            # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
       - run: gradle dependencies
@@ -42,5 +34,73 @@ jobs:
             - ~/.gradle
           key: v1-dependencies-{{ checksum "build.gradle" }}
 
-      # run tests!
-      - run: gradle test
+      - run: gradle build
+
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - .
+
+  test:
+    executor: default
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+
+      - run: gradle check
+
+      - store_test_results:
+          path: build/test-results
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - .
+
+  package:
+    executor: default
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "build.gradle" }}
+            - v1-dependencies-
+      - run: gradle jar
+      - store_artifacts:
+          path: build/libs/EasyStateMachine-1.0.jar
+
+  deploy:
+    executor: default
+
+    steps:
+      - attach_workspace:
+          at: ~/repo
+      - run: echo $mavenUsername $mavenPassword
+      - run: gradle publish
+
+workflows:
+  version: 2
+  build_and_package:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - package:
+          requires:
+            - test
+      - hold:
+          type: approval
+          requires:
+            - package
+      - deploy:
+          requires:
+            - hold
